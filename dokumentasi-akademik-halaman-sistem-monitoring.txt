@@ -1,0 +1,327 @@
+2.1.2 Implementasi Antarmuka Sistem Monitoring Coverage Jaringan
+
+Implementasi antarmuka Sistem Monitoring Coverage Jaringan pada platform Wikarta dirancang untuk mendukung proses monitoring, pengelolaan data infrastruktur, audit operasional, dan pelaporan secara terintegrasi. Seluruh halaman dibangun berbasis web dengan pendekatan modular agar pengguna dapat mengakses fungsi sistem sesuai peran (super admin, admin, teknisi).
+
+Secara umum, antarmuka sistem terdiri dari halaman publik (sebelum autentikasi), halaman autentikasi, halaman operasional inti (dashboard, peta, jaringan), halaman tata kelola (wilayah, pengguna, peran), halaman laporan, dan halaman pengaturan akun.
+
+A. Halaman Utama
+Halaman utama merupakan tampilan awal sistem yang berfungsi sebagai gerbang informasi dan navigasi awal pengguna. Halaman ini menampilkan ringkasan fungsi sistem sebagai pusat kendali jaringan fiber, meliputi manajemen OLT, ODC, ODP, ONT, visualisasi topologi, dan aktivitas operasional lapangan.
+
+Pada halaman utama terdapat komponen sebagai berikut:
+a) Header Navigasi, terdiri dari tombol Masuk dan Daftar bagi pengguna yang belum login, serta tombol Masuk Dashboard bagi pengguna yang sudah login.
+b) Informasi Utama Sistem, yang menjelaskan platform sebagai pusat kendali jaringan dan sinkronisasi data lapangan.
+c) Fitur Unggulan, meliputi:
+   - Monitoring status node secara real-time
+   - Pemetaan topologi berbasis wilayah
+   - Audit trail perubahan data
+d) Tombol Aksi:
+   - Mulai dari Login
+   - Lihat Peta Jaringan
+e) Modul Sistem, dikelompokkan ke tiga bagian:
+   - Jaringan
+   - Operasional
+   - Tata Kelola
+f) Workflow Ringkas Operasional, yang menjelaskan alur inventaris -> monitoring -> operasional.
+
+Berikut adalah tampilan halaman utama sistem:
+Gambar 2 Halaman Utama
+Gambar 3 Halaman Utama
+
+B. Halaman Login
+Halaman login berfungsi untuk melakukan autentikasi pengguna menggunakan email dan password. Halaman ini juga menyediakan opsi Remember Me serta tautan Forgot Password untuk pemulihan akses akun.
+
+Komponen utama:
+a) Input Email
+b) Input Password
+c) Checkbox Remember Me
+d) Tautan Forgot Password
+e) Tombol Log in
+f) Tautan Sign up (jika registrasi diaktifkan)
+
+Gambar 4 Halaman Login
+
+C. Halaman Registrasi
+Halaman registrasi digunakan untuk pendaftaran pengguna baru (sesuai kebijakan sistem). Halaman ini berisi form identitas pengguna dan kredensial akun.
+
+Komponen utama:
+a) Input nama pengguna
+b) Input email
+c) Input password dan konfirmasi password
+d) Tombol pendaftaran akun
+
+Gambar 5 Halaman Registrasi
+
+D. Halaman Lupa Password dan Reset Password
+Halaman lupa password digunakan untuk meminta tautan reset melalui email, sedangkan halaman reset password digunakan untuk menetapkan password baru.
+
+Komponen utama:
+a) Input email untuk permintaan reset
+b) Input password baru
+c) Input konfirmasi password
+
+d) Tombol kirim/reset
+
+Gambar 6 Halaman Lupa Password
+Gambar 7 Halaman Reset Password
+
+E. Halaman Verifikasi Email, Konfirmasi Password, dan Two-Factor Challenge
+Kelompok halaman ini berfungsi sebagai pengamanan tambahan akun.
+
+a) Verifikasi Email: konfirmasi email pengguna sebelum akses penuh ke sistem.
+b) Konfirmasi Password: validasi ulang password untuk aksi sensitif.
+c) Two-Factor Challenge: validasi kode OTP pada akun dengan 2FA aktif.
+
+Gambar 8 Halaman Verifikasi Email
+Gambar 9 Halaman Konfirmasi Password
+Gambar 10 Halaman Two-Factor Challenge
+
+F. Halaman Dashboard
+Dashboard berfungsi sebagai ringkasan cepat kondisi jaringan dan operasional.
+
+Komponen utama:
+a) Kartu KPI total ODP, ODC, OLT, dan total sambungan device
+b) Ringkasan distribusi status ODP
+c) Daftar ODP near capacity
+   d) Ringkasan maintenance terbaru
+
+e) Tautan cepat menuju modul terkait
+
+Gambar 11 Halaman Dashboard
+
+G. Halaman Peta Jaringan
+Halaman peta jaringan berfungsi untuk visualisasi geospasial seluruh node dan koneksinya.
+
+Komponen utama:
+a) Layer toggle OLT, ODC, ODP, ONT, dan sambungan
+b) Marker node berdasarkan jenis perangkat
+c) Garis koneksi antar parent-child (termasuk ODP -> ONT)
+d) Penanda pusat server utama
+e) Panel detail node saat marker dipilih
+f) Legenda warna status dan jenis koneksi
+
+Gambar 12 Halaman Peta Jaringan
+
+H. Modul Jaringan
+Modul jaringan terdiri dari 4 entitas utama: OLT, ODC, ODP, ONT. Setiap entitas memiliki halaman index, create, show, dan edit.
+
+H.1 Halaman OLT
+1) OLT Index
+   Menampilkan daftar OLT beserta status, kapasitas, wilayah, dan aksi manajemen data.
+   Gambar 13 Halaman OLT Index
+
+2) OLT Create
+   Digunakan untuk menambahkan OLT baru, termasuk parent OLT, informasi perangkat, kapasitas, dan koordinat.
+   Pada map input, parent marker dan garis parent -> titik terpilih ditampilkan untuk membantu penempatan.
+   Gambar 14 Halaman OLT Create
+
+3) OLT Show
+   Menampilkan detail OLT, statistik kapasitas, relasi perangkat, lokasi, dan histori maintenance.
+   Gambar 15 Halaman OLT Show
+
+4) OLT Edit
+   Digunakan untuk memperbarui data OLT yang sudah ada.
+   Gambar 16 Halaman OLT Edit
+
+H.2 Halaman ODC
+1) ODC Index
+   Menampilkan daftar ODC, status, kapasitas, parent OLT, dan wilayah.
+   Gambar 17 Halaman ODC Index
+
+2) ODC Create
+   Digunakan untuk menambah ODC baru dengan parent OLT, data teknis, dan koordinat.
+   Map menampilkan parent marker dan garis koneksi ke titik terpilih.
+   Gambar 18 Halaman ODC Create
+
+3) ODC Show
+   Menampilkan detail ODC, kapasitas, relasi ODP, lokasi, dan maintenance.
+   Gambar 19 Halaman ODC Show
+
+4) ODC Edit
+   Digunakan untuk pembaruan data ODC.
+   Gambar 20 Halaman ODC Edit
+
+H.3 Halaman ODP
+1) ODP Index
+   Menampilkan daftar ODP, status, kapasitas, parent device (ODC/OLT), dan data wilayah.
+   Gambar 21 Halaman ODP Index
+
+2) ODP Create
+   Digunakan untuk menambah ODP baru dengan parent ODC/OLT, kapasitas, dan lokasi.
+   Map menampilkan parent marker dan garis parent -> titik baru.
+   Gambar 22 Halaman ODP Create
+
+3) ODP Show
+   Menampilkan detail ODP, kapasitas, parent device, lokasi, dan log maintenance.
+   Gambar 23 Halaman ODP Show
+
+4) ODP Edit
+   Digunakan untuk memperbarui data ODP.
+   Gambar 24 Halaman ODP Edit
+
+H.4 Halaman ONT
+1) ONT Index
+   Menampilkan daftar ONT, parent ODP, data pelanggan, status, dan koordinat.
+   Gambar 25 Halaman ONT Index
+
+2) ONT Create
+   Digunakan untuk menambah ONT baru dengan parent ODP, serial number, data pelanggan, dan lokasi.
+   Map menampilkan parent ODP serta garis koneksi visual ke titik ONT.
+   Gambar 26 Halaman ONT Create
+
+3) ONT Show
+   Menampilkan detail ONT, relasi parent ODP, lokasi, dan maintenance.
+   Gambar 27 Halaman ONT Show
+
+4) ONT Edit
+   Digunakan untuk pembaruan data ONT.
+   Gambar 28 Halaman ONT Edit
+
+I. Modul Operasional
+I.1 Halaman Maintenance Log
+Halaman ini menampilkan daftar seluruh aktivitas maintenance lintas entitas (ODP, ODC, OLT, ONT), serta menyediakan filter berdasarkan tipe dan entitas.
+
+Gambar 29 Halaman Maintenance Log
+
+I.2 Halaman Activity Log
+Halaman ini menampilkan jejak perubahan data (created, updated, deleted, restored) sebagai mekanisme audit internal.
+
+Gambar 30 Halaman Activity Log
+
+J. Modul Tata Kelola Wilayah
+Modul ini mengelola struktur wilayah berjenjang: Provinsi -> Kota/Kabupaten -> Kecamatan -> Kelurahan/Desa.
+
+J.1 Provinsi
+1) Provinsi Index
+2) Provinsi Create
+3) Provinsi Edit
+Gambar 31 Halaman Provinsi Index
+Gambar 32 Halaman Provinsi Create
+Gambar 33 Halaman Provinsi Edit
+
+J.2 Kota/Kabupaten
+1) Kota/Kabupaten Index
+2) Kota/Kabupaten Create
+3) Kota/Kabupaten Edit
+Gambar 34 Halaman Kota/Kabupaten Index
+Gambar 35 Halaman Kota/Kabupaten Create
+Gambar 36 Halaman Kota/Kabupaten Edit
+
+J.3 Kecamatan
+1) Kecamatan Index
+2) Kecamatan Create
+3) Kecamatan Edit
+Gambar 37 Halaman Kecamatan Index
+Gambar 38 Halaman Kecamatan Create
+Gambar 39 Halaman Kecamatan Edit
+
+J.4 Kelurahan/Desa
+1) Kelurahan/Desa Index
+2) Kelurahan/Desa Create
+3) Kelurahan/Desa Edit
+Gambar 40 Halaman Kelurahan/Desa Index
+Gambar 41 Halaman Kelurahan/Desa Create
+Gambar 42 Halaman Kelurahan/Desa Edit
+
+K. Modul Administrasi
+K.1 Halaman Pengguna
+1) Users Index
+2) Users Create
+3) Users Edit
+Gambar 43 Halaman Users Index
+Gambar 44 Halaman Users Create
+Gambar 45 Halaman Users Edit
+
+K.2 Halaman Peran dan Akses
+Halaman ini menampilkan role sistem dan matriks hak akses yang berlaku.
+Gambar 46 Halaman Roles Index
+
+L. Modul Laporan
+L.1 Laporan Kapasitas
+Menyajikan utilisasi kapasitas ODP per wilayah dalam bentuk grafik dan tabel.
+Gambar 47 Halaman Laporan Kapasitas
+
+L.2 Laporan Coverage
+Menyajikan tingkat cakupan jaringan per area.
+Gambar 48 Halaman Laporan Coverage
+
+M. Modul Pengaturan Akun
+M.1 Profile Settings
+Pengguna dapat memperbarui nama dan email.
+Gambar 49 Halaman Profile Settings
+
+M.2 Password Settings
+Pengguna dapat memperbarui password akun.
+Gambar 50 Halaman Password Settings
+
+M.3 Two-Factor Settings
+Pengguna dapat mengaktifkan atau menonaktifkan autentikasi dua faktor.
+Gambar 51 Halaman Two-Factor Settings
+
+M.4 Appearance Settings
+Pengguna dapat menyesuaikan preferensi tampilan antarmuka.
+Gambar 52 Halaman Appearance Settings
+
+
+3. Panduan Pengambilan Screenshot Dokumen
+
+3.1 Ketentuan Teknis Screenshot
+Agar hasil dokumentasi konsisten dan dapat dinilai secara akademik, screenshot disarankan mengikuti ketentuan berikut:
+a) Resolusi minimal 1366 x 768 (desktop).
+b) Gunakan browser/viewport penuh, tanpa crop berlebihan.
+c) Pastikan nama halaman dan elemen utama terlihat jelas.
+d) Untuk halaman tabel, tampilkan header tabel dan minimal 3 baris data.
+e) Untuk halaman map, tampilkan layer aktif yang relevan dan legenda.
+f) Gunakan penomoran gambar berurutan sesuai urutan pembahasan.
+
+3.2 Urutan Screenshot Wajib (Disarankan)
+01) Halaman Utama (hero + CTA)
+02) Halaman Utama (modul tab)
+03) Login
+04) Registrasi
+05) Lupa Password
+06) Reset Password
+07) Verifikasi Email
+08) Dashboard
+09) Peta Jaringan (layer dasar)
+10) OLT Index
+11) OLT Create (parent marker + garis)
+12) OLT Show
+13) ODC Index
+14) ODC Create (parent marker + garis)
+15) ODP Index
+16) ODP Create (parent marker + garis)
+17) ONT Index
+18) ONT Create (parent marker + garis)
+19) Maintenance Log
+20) Activity Log
+21) Provinsi Index
+22) Kota/Kabupaten Index
+23) Kecamatan Index
+24) Kelurahan/Desa Index
+25) Users Index
+26) Roles Index
+27) Laporan Kapasitas
+28) Laporan Coverage
+29) Profile Settings
+30) Password Settings
+31) Two-Factor Settings
+32) Appearance Settings
+
+3.3 Arahan Narasi per Screenshot
+Untuk setiap gambar, gunakan format penjelasan berikut:
+a) Tujuan halaman: menjelaskan fungsi halaman dalam alur sistem.
+b) Komponen utama: menyebut elemen penting yang terlihat pada gambar.
+c) Nilai operasional: menjelaskan manfaat halaman bagi monitoring dan pengelolaan jaringan.
+
+Contoh format narasi:
+"Gambar 22 menampilkan Halaman ODP Create yang digunakan untuk menambahkan node ODP baru ke sistem. Pada halaman ini, pengguna dapat memilih parent device, mengisi kapasitas, dan menentukan koordinat lokasi. Fitur visual parent marker dan garis koneksi membantu pengguna memastikan relasi topologi agar input data tidak ambigu."
+
+3.4 Catatan Penyusunan Bab Laporan
+Jika dokumentasi ini dimasukkan ke laporan kerja praktik/skripsi, disarankan menggunakan susunan:
+- 2.1 Gambaran Umum Sistem
+- 2.1.1 Arsitektur dan Modul
+- 2.1.2 Implementasi Antarmuka (isi dokumen ini)
+- 2.1.3 Evaluasi Kegunaan Antarmuka
+- 2.1.4 Ringkasan Temuan
+
+Dengan susunan tersebut, pembahasan antarmuka akan lebih sistematis, mudah ditelusuri, dan sesuai format akademik.
