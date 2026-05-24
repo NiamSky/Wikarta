@@ -337,17 +337,14 @@ Schema aktif saat ini tidak lagi menyertakan tabel fiber_routes.
 ## Deployment ke cPanel via GitHub Actions
 
 ### Secrets yang wajib
-- CPANEL_HOST
-- CPANEL_PORT
-- CPANEL_USER
-- CPANEL_SSH_KEY
-- CPANEL_DEPLOY_PATH
+- FTP_HOST
+- FTP_PORT
+- FTP_USER
+- FTP_PASS
+- FTP_TARGET_DIR
 
-### Struktur server
-- `<DEPLOY_PATH>/releases/<tag>`
-- `<DEPLOY_PATH>/shared/.env`
-- `<DEPLOY_PATH>/shared/storage`
-- `<DEPLOY_PATH>/current`
+### Target deploy
+Workflow akan mirror upload hasil build ke `FTP_TARGET_DIR` (contoh: `public_html`).
 
 ### Trigger deploy
 Push tag dengan format `v*`, contoh:
@@ -357,9 +354,15 @@ git tag v1.0.0
 git push origin v1.0.0
 ```
 
-### Rollback cepat
-Upload script rollback lalu jalankan di server:
+### Catatan migrasi
+Deploy FTP tidak mengeksekusi artisan command otomatis.
+Jika ada perubahan schema, jalankan manual via cPanel Terminal:
 
 ```bash
-bash cpanel-rollback.sh /home/<user>/apps/wikarta v1.0.0
+php artisan migrate --force
+php artisan optimize:clear
+php artisan config:cache
 ```
+
+### Rollback cepat
+Rollback dilakukan dengan redeploy tag stabil sebelumnya (jalankan ulang workflow untuk tag release lama).
