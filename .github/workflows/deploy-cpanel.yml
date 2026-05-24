@@ -70,23 +70,23 @@ jobs:
         run: |
           mkdir -p deploy-zips
           cd release
-          zip -rq ../deploy-zips/laravel.zip . -x "public/*" "public/**"
+          zip -rq ../deploy-zips/laravel.zip .
           cd public
           zip -rq ../../deploy-zips/public_html.zip .
 
-      - name: Upload laravel.zip to app directory
+      - name: Upload laravel.zip to public directory
         env:
           FTP_HOST: ${{ secrets.FTP_HOST }}
           FTP_PORT: ${{ secrets.FTP_PORT }}
           FTP_USER: ${{ secrets.FTP_USER }}
           FTP_PASS: ${{ secrets.FTP_PASS }}
-          FTP_APP_DIR: ${{ secrets.FTP_APP_DIR }}
+          FTP_PUBLIC_DIR: ${{ secrets.FTP_PUBLIC_DIR }}
         run: |
           PORT="${FTP_PORT:-21}"
           curl --ftp-create-dirs --retry 3 --retry-delay 5 --connect-timeout 30 --max-time 1200 \
             -u "$FTP_USER:$FTP_PASS" \
             -T "deploy-zips/laravel.zip" \
-            "ftp://$FTP_HOST:$PORT/$FTP_APP_DIR/laravel.zip"
+            "ftp://$FTP_HOST:$PORT/$FTP_PUBLIC_DIR/laravel.zip"
 
       - name: Upload public_html.zip to public directory
         env:
