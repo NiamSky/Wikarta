@@ -1,7 +1,7 @@
 import { Head } from '@inertiajs/react';
-import { useFlash } from '@/hooks/use-flash';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { useFlash } from '@/hooks/use-flash';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
 

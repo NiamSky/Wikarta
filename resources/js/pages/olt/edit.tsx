@@ -1,13 +1,13 @@
 import { Head, Link, useForm } from '@inertiajs/react';
 import { lazy, Suspense, useState } from 'react';
-import { useFlash } from '@/hooks/use-flash';
+import InputError from '@/components/input-error';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Skeleton } from '@/components/ui/skeleton';
-import InputError from '@/components/input-error';
+import { Textarea } from '@/components/ui/textarea';
+import { useFlash } from '@/hooks/use-flash';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem, GeoRef, District, Olt, OltStatus } from '@/types';
 

@@ -1,5 +1,5 @@
-import { useEffect, useMemo, useRef } from 'react';
 import L from 'leaflet';
+import { useEffect, useMemo, useRef } from 'react';
 import 'leaflet/dist/leaflet.css';
 import { DEFAULT_MAP_CENTER, MAP_TILE_ATTRIBUTION, MAP_TILE_URL } from '@/lib/map-defaults';
 

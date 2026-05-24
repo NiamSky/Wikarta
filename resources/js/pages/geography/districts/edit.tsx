@@ -1,11 +1,11 @@
 import { Head, Link, useForm } from '@inertiajs/react';
 import { useState } from 'react';
-import { useFlash } from '@/hooks/use-flash';
+import InputError from '@/components/input-error';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import InputError from '@/components/input-error';
+import { useFlash } from '@/hooks/use-flash';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem, City, District, Province } from '@/types';
 

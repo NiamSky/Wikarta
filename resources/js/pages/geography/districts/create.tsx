@@ -1,13 +1,13 @@
 import { Head, Link, useForm, router } from '@inertiajs/react';
-import { useFlash } from '@/hooks/use-flash';
+import { useState } from 'react';
+import InputError from '@/components/input-error';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import InputError from '@/components/input-error';
+import { useFlash } from '@/hooks/use-flash';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem, City, Province } from '@/types';
-import { useState } from 'react';
 
 type Props = { provinces: Province[] };
 

@@ -1,13 +1,13 @@
 import { Head, Link, router } from '@inertiajs/react';
 import { PlusCircle, Trash2, Pencil, UserCheck, UserX } from 'lucide-react';
 import { useState } from 'react';
-import { useFlash } from '@/hooks/use-flash';
-import { Button } from '@/components/ui/button';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
+import { useFlash } from '@/hooks/use-flash';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem, User, Role } from '@/types';
 import type { PaginatedData } from '@/types/pagination';

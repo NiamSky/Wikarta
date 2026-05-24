@@ -1,18 +1,18 @@
 import { Head, Link } from '@inertiajs/react';
+import L from 'leaflet';
 import { useCallback, useEffect, useState } from 'react';
 import { MapContainer, Polyline, TileLayer, useMap } from 'react-leaflet';
 import MarkerClusterGroup from 'react-leaflet-cluster';
-import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { X, ExternalLink } from 'lucide-react';
-import AppLayout from '@/layouts/app-layout';
-import { StatusBadge } from '@/components/status-badge';
 import { CapacityBar } from '@/components/capacity-bar';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { StatusBadge } from '@/components/status-badge';
 import { Button } from '@/components/ui/button';
-import { Switch } from '@/components/ui/switch';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Switch } from '@/components/ui/switch';
+import AppLayout from '@/layouts/app-layout';
 import { DEFAULT_MAP_CENTER_TUPLE, MAIN_SERVER_HUB, MAP_TILE_ATTRIBUTION, MAP_TILE_URL } from '@/lib/map-defaults';
 import type { BreadcrumbItem, DeviceConnection, Odc, Odp, Olt, Ont } from '@/types';
 

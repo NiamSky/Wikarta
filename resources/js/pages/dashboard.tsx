@@ -1,10 +1,10 @@
 import { Head, Link } from '@inertiajs/react';
 import { Signal, Box, Radio, Network, AlertTriangle, Wrench, ArrowRight } from 'lucide-react';
-import { useFlash } from '@/hooks/use-flash';
-import { StatusBadge } from '@/components/status-badge';
 import { CapacityBar } from '@/components/capacity-bar';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { StatusBadge } from '@/components/status-badge';
 import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { useFlash } from '@/hooks/use-flash';
 import AppLayout from '@/layouts/app-layout';
 import { dashboard } from '@/routes';
 import type { BreadcrumbItem, MaintenanceLog } from '@/types';
