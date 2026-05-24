@@ -1,0 +1,93 @@
+name: deploy-cpanel
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          tools: composer:v2
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Install PHP Dependencies
+        run: composer install --no-dev --no-interaction --prefer-dist --optimize-autoloader
+
+      - name: Install Node Dependencies
+        run: npm ci
+
+      - name: Build Assets
+        run: npm run build
+
+      - name: Package Release
+        run: |
+          mkdir -p release
+          rsync -av --delete \
+            --exclude='.git' \
+            --exclude='node_modules' \
+            --exclude='tests' \
+            --exclude='.github' \
+            --exclude='release' \
+            ./ release/
+
+      - name: Upload Release Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-release
+          path: release
+
+      - name: Download build artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: app-release
+          path: release
+
+      - name: Setup SSH key
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.CPANEL_SSH_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -p "${{ secrets.CPANEL_PORT }}" "${{ secrets.CPANEL_HOST }}" >> ~/.ssh/known_hosts
+
+      - name: Create remote release directory
+        run: |
+          TAG="${GITHUB_REF_NAME}"
+          ssh -p "${{ secrets.CPANEL_PORT }}" "${{ secrets.CPANEL_USER }}@${{ secrets.CPANEL_HOST }}" \
+            "mkdir -p '${{ secrets.CPANEL_DEPLOY_PATH }}/releases/${TAG}'"
+
+      - name: Rsync release to cPanel
+        run: |
+          TAG="${GITHUB_REF_NAME}"
+          rsync -az --delete -e "ssh -p ${{ secrets.CPANEL_PORT }}" \
+            release/ "${{ secrets.CPANEL_USER }}@${{ secrets.CPANEL_HOST }}:${{ secrets.CPANEL_DEPLOY_PATH }}/releases/${TAG}/"
+
+      - name: Upload deploy script
+        run: |
+          rsync -az -e "ssh -p ${{ secrets.CPANEL_PORT }}" \
+            .github/scripts/cpanel-deploy.sh \
+            "${{ secrets.CPANEL_USER }}@${{ secrets.CPANEL_HOST }}:${{ secrets.CPANEL_DEPLOY_PATH }}/cpanel-deploy.sh"
+
+      - name: Run remote deploy script
+        run: |
+          TAG="${GITHUB_REF_NAME}"
+          ssh -p "${{ secrets.CPANEL_PORT }}" "${{ secrets.CPANEL_USER }}@${{ secrets.CPANEL_HOST }}" \
+            "chmod +x '${{ secrets.CPANEL_DEPLOY_PATH }}/cpanel-deploy.sh' && '${{ secrets.CPANEL_DEPLOY_PATH }}/cpanel-deploy.sh' '${{ secrets.CPANEL_DEPLOY_PATH }}' '${TAG}'"
+
+      - name: HTTP health check (optional)
+        if: ${{ secrets.APP_HEALTHCHECK_URL != '' }}
+        run: |
+          curl -fSL "${{ secrets.APP_HEALTHCHECK_URL }}"
