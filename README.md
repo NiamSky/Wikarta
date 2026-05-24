@@ -346,11 +346,15 @@ Schema aktif saat ini tidak lagi menyertakan tabel fiber_routes.
 - APP_BASE_RELATIVE
 
 ### Target deploy
-Workflow akan upload dua target:
-- `public/*` -> `FTP_PUBLIC_DIR` (contoh: `public_html`)
-- selain `public/*` -> `FTP_APP_DIR` (contoh: `public_html/laravel`)
+Workflow akan menghasilkan dan upload 2 ZIP:
+- `laravel.zip` -> `FTP_APP_DIR` (contoh: `public_html/laravel`)
+- `public_html.zip` -> `FTP_PUBLIC_DIR` (contoh: `public_html`)
 
 `APP_BASE_RELATIVE` dipakai untuk patch otomatis `public/index.php` agar path `storage`, `vendor`, `bootstrap` menunjuk ke folder app (contoh nilai: `laravel`).
+
+Setelah workflow selesai, extract manual di cPanel:
+- extract `laravel.zip` ke folder app (`FTP_APP_DIR`)
+- extract `public_html.zip` ke folder public (`FTP_PUBLIC_DIR`)
 
 ### Trigger deploy
 Push tag dengan format `v*`, contoh:

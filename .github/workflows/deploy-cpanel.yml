@@ -66,99 +66,38 @@ jobs:
           sed -i "s#__DIR__.'/../vendor#__DIR__.'/${APP_BASE_RELATIVE}/vendor#g" "$INDEX_FILE"
           sed -i "s#__DIR__.'/../bootstrap#__DIR__.'/${APP_BASE_RELATIVE}/bootstrap#g" "$INDEX_FILE"
 
-      - name: Deploy Laravel app files via FTP (attempt 1)
-        id: ftp_app_1
-        continue-on-error: true
-        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
-        with:
-          server: ${{ secrets.FTP_HOST }}
-          username: ${{ secrets.FTP_USER }}
-          password: ${{ secrets.FTP_PASS }}
-          port: ${{ secrets.FTP_PORT }}
-          protocol: ftp
-          timeout: 120000
-          local-dir: release/
-          server-dir: ${{ secrets.FTP_APP_DIR }}/
-          dangerous-clean-slate: false
-          exclude: |
-            **/.git*
-            **/.github/**
-            **/node_modules/**
-            **/tests/**
-            **/.env
-            public/**
+      - name: Create deployment ZIP files
+        run: |
+          mkdir -p deploy-zips
+          cd release
+          zip -rq ../deploy-zips/laravel.zip . -x "public/*" "public/**"
+          cd public
+          zip -rq ../../deploy-zips/public_html.zip .
 
-      - name: Deploy Laravel app files via FTP (attempt 2)
-        id: ftp_app_2
-        if: steps.ftp_app_1.outcome == 'failure'
-        continue-on-error: true
-        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
-        with:
-          server: ${{ secrets.FTP_HOST }}
-          username: ${{ secrets.FTP_USER }}
-          password: ${{ secrets.FTP_PASS }}
-          port: ${{ secrets.FTP_PORT }}
-          protocol: ftp
-          timeout: 120000
-          local-dir: release/
-          server-dir: ${{ secrets.FTP_APP_DIR }}/
-          dangerous-clean-slate: false
-          exclude: |
-            **/.git*
-            **/.github/**
-            **/node_modules/**
-            **/tests/**
-            **/.env
-            public/**
+      - name: Upload laravel.zip to app directory
+        env:
+          FTP_HOST: ${{ secrets.FTP_HOST }}
+          FTP_PORT: ${{ secrets.FTP_PORT }}
+          FTP_USER: ${{ secrets.FTP_USER }}
+          FTP_PASS: ${{ secrets.FTP_PASS }}
+          FTP_APP_DIR: ${{ secrets.FTP_APP_DIR }}
+        run: |
+          PORT="${FTP_PORT:-21}"
+          curl --ftp-create-dirs --retry 3 --retry-delay 5 --connect-timeout 30 --max-time 1200 \
+            -u "$FTP_USER:$FTP_PASS" \
+            -T "deploy-zips/laravel.zip" \
+            "ftp://$FTP_HOST:$PORT/$FTP_APP_DIR/laravel.zip"
 
-      - name: Fail if app upload failed
-        if: steps.ftp_app_1.outcome == 'failure' && steps.ftp_app_2.outcome == 'failure'
-        run: exit 1
-
-      - name: Deploy public files via FTP (attempt 1)
-        id: ftp_public_1
-        if: steps.ftp_app_1.outcome == 'success' || steps.ftp_app_2.outcome == 'success'
-        continue-on-error: true
-        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
-        with:
-          server: ${{ secrets.FTP_HOST }}
-          username: ${{ secrets.FTP_USER }}
-          password: ${{ secrets.FTP_PASS }}
-          port: ${{ secrets.FTP_PORT }}
-          protocol: ftp
-          timeout: 120000
-          local-dir: release/public/
-          server-dir: ${{ secrets.FTP_PUBLIC_DIR }}/
-          dangerous-clean-slate: false
-          exclude: |
-            **/.git*
-            **/.github/**
-            **/node_modules/**
-            **/tests/**
-            **/.env
-
-      - name: Deploy public files via FTP (attempt 2)
-        id: ftp_public_2
-        if: (steps.ftp_app_1.outcome == 'success' || steps.ftp_app_2.outcome == 'success') && steps.ftp_public_1.outcome == 'failure'
-        continue-on-error: true
-        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
-        with:
-          server: ${{ secrets.FTP_HOST }}
-          username: ${{ secrets.FTP_USER }}
-          password: ${{ secrets.FTP_PASS }}
-          port: ${{ secrets.FTP_PORT }}
-          protocol: ftp
-          timeout: 120000
-          local-dir: release/public/
-          server-dir: ${{ secrets.FTP_PUBLIC_DIR }}/
-          dangerous-clean-slate: false
-          exclude: |
-            **/.git*
-            **/.github/**
-            **/node_modules/**
-            **/tests/**
-            **/.env
-
-      - name: Fail if public upload failed
-        if: (steps.ftp_app_1.outcome == 'success' || steps.ftp_app_2.outcome == 'success') && steps.ftp_public_1.outcome == 'failure' && steps.ftp_public_2.outcome == 'failure'
-        run: exit 1
+      - name: Upload public_html.zip to public directory
+        env:
+          FTP_HOST: ${{ secrets.FTP_HOST }}
+          FTP_PORT: ${{ secrets.FTP_PORT }}
+          FTP_USER: ${{ secrets.FTP_USER }}
+          FTP_PASS: ${{ secrets.FTP_PASS }}
+          FTP_PUBLIC_DIR: ${{ secrets.FTP_PUBLIC_DIR }}
+        run: |
+          PORT="${FTP_PORT:-21}"
+          curl --ftp-create-dirs --retry 3 --retry-delay 5 --connect-timeout 30 --max-time 1200 \
+            -u "$FTP_USER:$FTP_PASS" \
+            -T "deploy-zips/public_html.zip" \
+            "ftp://$FTP_HOST:$PORT/$FTP_PUBLIC_DIR/public_html.zip"
