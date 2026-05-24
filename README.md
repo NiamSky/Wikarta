@@ -341,10 +341,16 @@ Schema aktif saat ini tidak lagi menyertakan tabel fiber_routes.
 - FTP_PORT
 - FTP_USER
 - FTP_PASS
-- FTP_TARGET_DIR
+- FTP_PUBLIC_DIR
+- FTP_APP_DIR
+- APP_BASE_RELATIVE
 
 ### Target deploy
-Workflow akan mirror upload hasil build ke `FTP_TARGET_DIR` (contoh: `public_html`).
+Workflow akan upload dua target:
+- `public/*` -> `FTP_PUBLIC_DIR` (contoh: `public_html`)
+- selain `public/*` -> `FTP_APP_DIR` (contoh: `public_html/laravel`)
+
+`APP_BASE_RELATIVE` dipakai untuk patch otomatis `public/index.php` agar path `storage`, `vendor`, `bootstrap` menunjuk ke folder app (contoh nilai: `laravel`).
 
 ### Trigger deploy
 Push tag dengan format `v*`, contoh:

@@ -44,8 +44,30 @@ jobs:
             --exclude='release' \
             ./ release/
 
-      - name: Deploy via FTP (attempt 1)
-        id: ftp_deploy_1
+      - name: Patch public/index.php for cPanel structure
+        env:
+          APP_BASE_RELATIVE: ${{ secrets.APP_BASE_RELATIVE }}
+        run: |
+          if [ -z "$APP_BASE_RELATIVE" ]; then
+            echo "APP_BASE_RELATIVE secret is required"
+            exit 1
+          fi
+
+          APP_BASE_RELATIVE="${APP_BASE_RELATIVE#/}"
+          APP_BASE_RELATIVE="${APP_BASE_RELATIVE%/}"
+
+          if [ -z "$APP_BASE_RELATIVE" ]; then
+            echo "APP_BASE_RELATIVE must not be empty"
+            exit 1
+          fi
+
+          INDEX_FILE="release/public/index.php"
+          sed -i "s#__DIR__.'/../storage#__DIR__.'/${APP_BASE_RELATIVE}/storage#g" "$INDEX_FILE"
+          sed -i "s#__DIR__.'/../vendor#__DIR__.'/${APP_BASE_RELATIVE}/vendor#g" "$INDEX_FILE"
+          sed -i "s#__DIR__.'/../bootstrap#__DIR__.'/${APP_BASE_RELATIVE}/bootstrap#g" "$INDEX_FILE"
+
+      - name: Deploy Laravel app files via FTP (attempt 1)
+        id: ftp_app_1
         continue-on-error: true
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
@@ -56,7 +78,7 @@ jobs:
           protocol: ftp
           timeout: 120000
           local-dir: release/
-          server-dir: ${{ secrets.FTP_TARGET_DIR }}/
+          server-dir: ${{ secrets.FTP_APP_DIR }}/
           dangerous-clean-slate: false
           exclude: |
             **/.git*
@@ -64,10 +86,11 @@ jobs:
             **/node_modules/**
             **/tests/**
             **/.env
+            public/**
 
-      - name: Deploy via FTP (attempt 2)
-        id: ftp_deploy_2
-        if: steps.ftp_deploy_1.outcome == 'failure'
+      - name: Deploy Laravel app files via FTP (attempt 2)
+        id: ftp_app_2
+        if: steps.ftp_app_1.outcome == 'failure'
         continue-on-error: true
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
@@ -78,7 +101,34 @@ jobs:
           protocol: ftp
           timeout: 120000
           local-dir: release/
-          server-dir: ${{ secrets.FTP_TARGET_DIR }}/
+          server-dir: ${{ secrets.FTP_APP_DIR }}/
+          dangerous-clean-slate: false
+          exclude: |
+            **/.git*
+            **/.github/**
+            **/node_modules/**
+            **/tests/**
+            **/.env
+            public/**
+
+      - name: Fail if app upload failed
+        if: steps.ftp_app_1.outcome == 'failure' && steps.ftp_app_2.outcome == 'failure'
+        run: exit 1
+
+      - name: Deploy public files via FTP (attempt 1)
+        id: ftp_public_1
+        if: steps.ftp_app_1.outcome == 'success' || steps.ftp_app_2.outcome == 'success'
+        continue-on-error: true
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.FTP_HOST }}
+          username: ${{ secrets.FTP_USER }}
+          password: ${{ secrets.FTP_PASS }}
+          port: ${{ secrets.FTP_PORT }}
+          protocol: ftp
+          timeout: 120000
+          local-dir: release/public/
+          server-dir: ${{ secrets.FTP_PUBLIC_DIR }}/
           dangerous-clean-slate: false
           exclude: |
             **/.git*
@@ -87,6 +137,28 @@ jobs:
             **/tests/**
             **/.env
 
-      - name: Fail if all FTP attempts failed
-        if: steps.ftp_deploy_1.outcome == 'failure' && steps.ftp_deploy_2.outcome == 'failure'
+      - name: Deploy public files via FTP (attempt 2)
+        id: ftp_public_2
+        if: (steps.ftp_app_1.outcome == 'success' || steps.ftp_app_2.outcome == 'success') && steps.ftp_public_1.outcome == 'failure'
+        continue-on-error: true
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.FTP_HOST }}
+          username: ${{ secrets.FTP_USER }}
+          password: ${{ secrets.FTP_PASS }}
+          port: ${{ secrets.FTP_PORT }}
+          protocol: ftp
+          timeout: 120000
+          local-dir: release/public/
+          server-dir: ${{ secrets.FTP_PUBLIC_DIR }}/
+          dangerous-clean-slate: false
+          exclude: |
+            **/.git*
+            **/.github/**
+            **/node_modules/**
+            **/tests/**
+            **/.env
+
+      - name: Fail if public upload failed
+        if: (steps.ftp_app_1.outcome == 'success' || steps.ftp_app_2.outcome == 'success') && steps.ftp_public_1.outcome == 'failure' && steps.ftp_public_2.outcome == 'failure'
         run: exit 1
